@@ -1,0 +1,39 @@
+﻿using Common;
+using Grpc.Net.Client;
+using GrpcAgent;
+using System;
+
+namespace Sender
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Publisher");
+
+            var channel = GrpcChannel.ForAddress(EndpointsConstants.BrokerAddress);
+            var client = new Publisher.PublisherClient(channel);
+
+            while (true) 
+            {
+                Console.Write("Enter the topic: ");
+                var topic = Console.ReadLine().ToLower();
+
+                Console.WriteLine("Enter content: ");
+                var content = Console.ReadLine();
+
+                var request = new PublishRequest() { Topic = topic, Content = content };
+
+                try
+                {
+                    var reply = client.PublishMessage(request);
+                    Console.WriteLine($"Publish Reply: {reply.IsSuccess}");
+                }
+                catch (Exception ex) 
+                {
+                    Console.WriteLine($"Error publishing the message: {ex.Message}");
+                }
+            }
+        }
+    }
+}
