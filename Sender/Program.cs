@@ -7,10 +7,11 @@ namespace Sender
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Publisher");
 
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             var channel = GrpcChannel.ForAddress(EndpointsConstants.BrokerAddress);
             var client = new Publisher.PublisherClient(channel);
 
@@ -26,7 +27,7 @@ namespace Sender
 
                 try
                 {
-                    var reply = client.PublishMessage(request);
+                    var reply = await client.PublishMessageAsync(request);
                     Console.WriteLine($"Publish Reply: {reply.IsSuccess}");
                 }
                 catch (Exception ex) 
